@@ -1,0 +1,24 @@
+{
+    "name": "mokai-syntax",
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Tiny syntax highlighter for Mokai editor",
+    "repository": "https://github.com/jmjuanes/mokai",
+    "author": "Josemi Juanes <hello@josemi.xyz>",
+    "bugs": "https://github.com/jmjuanes/mokai/issues",
+    "homepage": "https://www.josemi.xyz/mokai",
+    "main": "index.js",
+    "module": "index.js",
+    "exports": {
+        ".": "./index.js",
+        "./index.js": "./index.js",
+        "./package.json": "./package.json"
+    },
+    "types": "./index.d.ts",
+    "files": [
+        "README.md",
+        "index.js",
+        "index.d.ts"
+    ],
+    "license": "MIT"
+}
