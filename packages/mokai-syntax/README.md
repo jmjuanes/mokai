@@ -3,7 +3,7 @@
 ![npm version](https://badgen.net/npm/v/mokai-syntax?labelColor=1d2734&color=21bf81)
 ![license](https://badgen.net/github/license/jmjuanes/mokai?labelColor=1d2734&color=21bf81)
 
-Tiny zero‑dependency syntax highlighter used by the [Mokai](https://github.com/jmjuanes/mokai) web code editor. It is intentionally minimal: a handful of simple (yet carefully ordered) regular expressions that turn source code into an HTML string decorated with `<span class="token-…">` elements. No DOM required, works in browsers and server/runtime environments that support ES Modules.
+Tiny zero‑dependency syntax highlighter used by the [Mokai](https://github.com/jmjuanes/mokai) web code editor. It is intentionally minimal: a handful of simple (yet carefully ordered) regular expressions that turn source code into an HTML string decorated with `<span class="token-x">` elements. No DOM required, works in browsers and server/runtime environments that support ES Modules.
 
 > If you need a fully–featured, language‑rich, battle‑tested highlighter, you should use something like Prism, highlight.js, Shiki, or CodeMirror. `mokai-syntax` favors tiny footprint and predictable output over exhaustive language coverage.
 
@@ -74,8 +74,8 @@ Unknown / unsupported parts of the input are safely HTML‑escaped and emitted w
 
 #### Parameters
 
-* `code` – raw source code.
-* `language` – one of: `html`, `javascript`, `css`, `markdown` (aliases: `js`, `jsx`, `md`). If omitted or not found, JavaScript rules are used as a fallback.
+* `code` - raw source code.
+* `language` - one of: `html`, `javascript`, `css`, `markdown`. If omitted or not found, JavaScript rules are used as a fallback.
 
 #### Return value
 
