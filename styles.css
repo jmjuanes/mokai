@@ -1,0 +1,72 @@
+.mokai {
+    display: flex;
+    font-family: "Source Code Pro", monospace;
+    letter-spacing: normal;
+    min-height: 0;
+    padding: 20px;
+    width: 100%;
+}
+.mokai-editor {
+    flex-grow: 1;
+    font-size: 14px;
+    font-weight: 400;
+    height: 100%;
+    line-height: 20px;
+    overflow: auto;
+    overflow-wrap: normal;
+    outline: none;
+    width: 100%;
+    white-space: pre; /* pre-wrap */
+    word-wrap: normal;
+}
+.mokai-gutters {
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+    width: 48px;
+}
+.mokai-lines {
+    bottom: 0px;
+    color: currentColor;
+    font-size: 12px;
+    line-height: 20px;
+    opacity: 0.5;
+    overflow: hidden;
+    padding-right: 16px;
+    position: absolute;
+    right: 0px;
+    text-align: right;
+    top: 0px;
+}
+.mokai-lines > div {
+    margin-bottom: 4px;
+    min-height: 16px;
+}
+.mokai-lines > div:not(:first-child) {
+    margin-top: 4px;
+}
+
+/* Terrible hack to hide last empty line in editor */
+.mokai-editor .line:last-child,
+.mokai-lines > div:last-child {
+    display: none !important;
+}
+
+/* Editor scrollbar */
+.mokai-editor::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.mokai-editor::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+.mokai-editor::-webkit-scrollbar-thumb {
+    background-color: currentColor;
+    border-radius: 16px;
+}
+.mokai-editor::-webkit-scrollbar-button {
+    display: none;
+}
+.mokai-editor::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
