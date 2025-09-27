@@ -1,0 +1,23 @@
+{
+    "name": "mokai-themes",
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Themes for the Mokai code editor",
+    "repository": "https://github.com/jmjuanes/mokai",
+    "author": "Josemi Juanes <hello@josemi.xyz>",
+    "bugs": "https://github.com/jmjuanes/mokai/issues",
+    "homepage": "https://www.josemi.xyz/mokai",
+    "main": "styles.css",
+    "styles": "styles.css",
+    "exports": {
+        ".": "./styles.css",
+        "./styles.css": "./styles.css",
+        "./themes.css": "./styles.css",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "README.md",
+        "styles.css"
+    ],
+    "license": "MIT"
+}
