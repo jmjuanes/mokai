@@ -2,28 +2,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
-        <title>CodeCake Demo</title>
+        <title>Mokai Demo</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@700&display=swap">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;700&display=swap">
-        <link rel="stylesheet" href="./node_modules/lowcss/dist/low.css">
-        <link rel="stylesheet" href="./codecake.css">
+        <link rel="stylesheet" href="https://unpkg.com/lowcss/low.css">
+        <link rel="stylesheet" href="https://unpkg.com/lowcss-forms/index.css">
+        <link rel="stylesheet" href="./styles.css">
+        <link rel="stylesheet" href="./packages/mokai-themes/styles.css">
     </head>
-    <body class="m-0 font-lato text-gray-900 leading-normal">
+    <body class="m-0 font-sans text-gray-900 leading-normal">
         <!-- Main content -->
         <div class="main w-full max-w-4xl mx-auto px-6">
-            <!-- Header section -->
-            <div class="w-full mt-4 md:mt-12 mb-6">
-                <div class="flex justify-between items-center w-full">
-                    <div class="text-xl md:text-2xl font-bold font-plex-serif tracking-tight select-none">
-                        <a href="./" class="text-gray-950">CodeCake</a>
-                    </div>
-                    <div class="flex gap-4">
-                        <a href="./demo.html" class="font-medium text-gray-900 hover:text-gray-800 hover:underline">Demo</a>
-                        <a href="https://github.com/jmjuanes/codecake#api" class="font-medium text-gray-900 hover:text-gray-800 hover:underline">API</a>
-                        <a href="https://github.com/jmjuanes/codecake" class="font-medium text-gray-900 hover:text-gray-800 hover:underline">GitHub</a>
-                    </div>
-                </div>
-            </div>
             <!-- Hero section -->
             <div class="w-full pt-6 pb-6">
                 <div class="text-4xl font-bold font-plex-serif tracking-tight">
@@ -32,10 +21,10 @@
             </div>
             <div class="w-full">
                 <!-- Demo options -->
-                <div class="rounded-md bg-neutral-100 p-4 grid grid-cols-1 md:grid-cols-2 mb-4 gap-4 select-none">
+                <div class="rounded-lg bg-gray-100 p-4 grid grid-cols-1 md:grid-cols-2 mb-4 gap-4 select-none">
                     <div class="">
                         <div class="font-bold mb-1">Language:</div>
-                        <select class="w-full bg-neutral-200 rounded-md" id="select-language">
+                        <select class="w-full bg-white rounded-md border-0" id="select-language">
                             <option value="javascript">JavaScript</option>
                             <option value="html">HTML</option>
                             <option value="css">CSS</option>
@@ -44,17 +33,17 @@
                     </div>
                     <div class="">
                         <div class="font-bold mb-1">Theme</div>
-                        <select class="w-full bg-neutral-200 rounded-md" id="select-theme">
-                            <option value="dark">Dark (codecake-dark)</option>
-                            <option value="light">Light (codecake-light)</option>
-                            <option value="monoblue">Mono Blue (codecake-monoblue)</option>
-                            <option value="one-dark">One Dark (codecake-one-dark)</option>
-                            <option value="one-light">One Light (codecake-one-light)</option>
+                        <select class="w-full bg-white rounded-md border-0" id="select-theme">
+                            <option value="dark">Dark (mokai-dark)</option>
+                            <option value="light">Light (mokai-light)</option>
+                            <option value="monoblue">Mono Blue (mokai-monoblue)</option>
+                            <option value="one-dark">One Dark (mokai-one-dark)</option>
+                            <option value="one-light">One Light (mokai-one-light)</option>
                         </select>
                     </div>
                 </div>
                 <!-- Demo editor-->
-                <div id="editor" class="shadow-lg rounded-md overflow-hidden flex"></div>
+                <div id="editor" class="shadow-lg rounded-lg overflow-hidden flex"></div>
             </div>
             <!-- Footer section -->
             <div class="pb-16 pt-16 text-sm text-gray-700">
@@ -63,40 +52,42 @@
         </div>
         <!-- Editor code -->
         <script type="module">
-            import * as CodeCake from "./codecake.js";
+            import mokai from "./index.js";
+            import mokaiHighlight from "./packages/mokai-syntax/index.js";
 
             const codes = {
                 javascript: [
-                    `import * as CodeCake from "codecake";`,
+                    `import mokai from "mokai";`,
+                    `import highlight from "mokai-syntax";`,
                     ``,
                     `// First get reference to the target element`,
                     `const target = document.getElementById("editor");`,
                     ``,            
                     `// Initialize codecake editor`,
-                    `const cake = CodeCake.create(target, {`,
-                    `    code: "",`,
-                    `    className: "codecake-{theme}",`,
+                    `const editor = mokai(target, {`,
+                    `    value: "",`,
+                    `    className: "mokai-{theme}",`,
                     `    readOnly: false,`,
                     `    lineNumbers: true,`,
-                    `    highlight: code => CodeCake.highlight(code, "javascript"),`,
+                    `    highlight: code => highlight(code, "javascript"),`,
                     `});`,
                     ``,
                     `// You can use the API methods to access the code`,
-                    `cake.setCode("Hello world!");`,
+                    `editor.set("Hello world!");`,
                     ``,
                     `// Register events listeners`,
-                    `cake.onChange(code => console.log("New code: ", code));`,
+                    `editor.on("change", event => console.log("New code: ", event.value));`,
                 ],
                 html: [
                     `<html lang="en">`,
                     `<head>`,
                     `  <meta charset="utf-8">`,
-                    `  <title>CodeCake demo</title>`,
+                    `  <title>Mokai demo</title>`,
                     `</head>`,
                     `<body>`,
-                    `    <h1>CodeCake - Tiny code editor</h1>`,
+                    `    <h1>Mokai - Tiny code editor</h1>`,
                     `    <div class="description">`,
-                    `        <b>CodeCake</b> is a tiny code editor written in less than 200 lines of code!`,
+                    `        <b>Mokai</b> is a tiny code editor written in less than 200 lines of code!`,
                     `    </div>`,
                     `</body>`,
                     `</html>`,
@@ -135,7 +126,7 @@
                     `}`,
                 ],
                 markdown: [
-                    `# CodeCake`,
+                    `# Mokai`,
                     ``,
                     `> A tiny and lightweight code editor for web applications.`,
                     ``,
@@ -147,10 +138,10 @@
                     ``,
                     `## Installation`,
                     ``,
-                    `Install **CodeCake** in your project with just one command:`,
+                    `Install **mokai** in your project with just one command:`,
                     ``,
                     "```bash",
-                    `npm install --save codecake`,
+                    `npm install --save mokai`,
                     "```",
                 ],
             };
@@ -168,14 +159,17 @@
                     parent.removeChild(parent.firstChild);
                 }
 
-                // Initialize cake editor
-                CodeCake.create(parent, {
-                    code: codes[options.language].join("\n").replace("{theme}", options.theme),
-                    className: `codecake-${options.theme} h-full`,
+                // Initialize the editor
+                const editor = mokai(parent, {
+                    value: codes[options.language].join("\n").replace("{theme}", options.theme),
+                    className: `mokai-${options.theme} h-full`,
                     readOnly: false,
                     lineNumbers: options.linenumbers,
-                    highlight: options.highlight && (code => CodeCake.highlight(code, options.language)),
+                    highlight: options.highlight && (code => mokaiHighlight(code, options.language)),
                 });
+                // editor.on("change", ({ value }) => {
+                //     console.log("New code: ", value);
+                // });
             };
 
             // Register listeners to language and theme
