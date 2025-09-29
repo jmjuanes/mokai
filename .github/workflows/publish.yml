@@ -1,0 +1,39 @@
+name: Publish
+on:
+  push:
+    tags: ['*']
+
+## Set permissions to the github token
+## https://github.com/softprops/action-gh-release#permissions 
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: ${{ github.repository == 'jmjuanes/mokai' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish-packages:
+    if: ${{ github.repository == 'jmjuanes/mokai' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [mokai-syntax, mokai-themes]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn release
+      - run: cd packages/${{ matrix.package }} && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
