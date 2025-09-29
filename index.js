@@ -207,8 +207,8 @@ export default (parent, options = {}) => {
     // Initialize editor values
     options?.code ? setCode(options?.code) : update(1);
     return {
-        getCode: () => getCode(),
-        setCode: code => setCode(code || "", 1),
+        get: () => getCode(),
+        set: code => setCode(code || "", 1),
         on: (eventName, listener) => emitter.on(eventName, listener),
         off: eventName => emitter.off(eventName),
     };
