@@ -126,6 +126,8 @@ Currently implemented:
 | javascript (js, jsx) | Strings, template literals, numbers, keywords, JSX tags/attributes, simple function detection |
 | css         | Declarations, at-rules, numbers, units, colors, basic selectors, comments |
 | markdown (md) | Headings, fenced/inline code, emphasis, strong, lists, links/images, quotes |
+| json        | Full support (subset of JavaScript) |
+| yaml (yml)  | Basic key-value pairs, lists, comments, strings, numbers, booleans |
 
 Adding more languages or extending rules means editing the `languages` object inside `index.js`. The design is intentionally straightforward: a language is an ordered array of rule objects tried left‑to‑right.
 
