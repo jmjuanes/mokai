@@ -18,6 +18,9 @@
         "./package.json": "./package.json"
     },
     "types": "./index.d.ts",
+    "scripts": {
+        "release": "node scripts/release.js"
+    },
     "files": [
         "README.md",
         "LICENSE",
