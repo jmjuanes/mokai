@@ -114,6 +114,24 @@ const languages = {
             {regex: /^([\w]+)/, token: "word"},
         ],
     },
+    json: {
+        aliases: [],
+        rules: [
+            {regex: /^(\/\/.*)/, token: "comment"},
+            {
+                starts: /^\/\*/,
+                ends: /\*\//,
+                rules: [
+                    {regex: /^(.+)/, token: "comment"},
+                ],
+            },
+            {regex: /^(\s*[\{\}\[\],])/, token: "punctuation"},
+            {regex: /^(\s*\"(\\.|[^\"])*\"\s*:)/, token: "attr"},
+            {regex: /^(\s*\"(\\.|[^\"])*\")/, token: "string"},
+            {regex: /^(\s*\b(true|false|null)\b)/, token: "constant"},
+            {regex: /^(\s*[+-]?([0-9]*[.])?[0-9]+\b)/, token: "number"},
+        ],
+    },
     css: {
         aliases: [],
         rules: [
