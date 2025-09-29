@@ -1,137 +1,202 @@
-![CodeCake](./header.png)
+# mokai
 
+> Tiny, dependency‑free code editor for the web – minimal DOM, minimal API, fast edits.
 
-![npm version](https://badgen.net/npm/v/codecake?labelColor=1d2734&color=21bf81)
-![license](https://badgen.net/github/license/jmjuanes/codecake?labelColor=1d2734&color=21bf81)
+![npm version](https://badgen.net/npm/v/mokai?labelColor=1d2734&color=21bf81)
+![license](https://badgen.net/github/license/jmjuanes/mokai?labelColor=1d2734&color=21bf81)
 
-Why another code editor for the web? I wanted something very simple, tiny and minimalistic, just for editing small chunks of HTML, JavaScript or CSS. Finally I decided to create my own code editor with a small syntax highlight.
+Why another embeddable editor? I wanted something extremely small and predictable for editing short snippets of HTML / JS / CSS / Markdown without shipping a full IDE. Mokai focuses on: tiny surface area, no virtual DOM, no workers by default, and opt‑in syntax highlighting.
 
 ## Demo
 
-Visit [josemi.xyz/codecake](https://www.josemi.xyz/codecake) to see a working example of the **CodeCake** editor.
+Visit https://www.josemi.xyz/mokai for a live demo.
 
-## Getting started
+## Features
 
-You can install **CodeCake** using npm or yarn:
+- ~1 small function: default export returns an editor object.
+- No dependencies, no build step required (ESM + CDN friendly).
+- Optional line numbers.
+- Optional auto indent + bracket / quote auto‑closing.
+- Pluggable syntax highlighting (bring your own or use `mokai-syntax`).
+- Theming via plain CSS classes (`mokai-themes` package).
+- Esc + Tab / Esc + Shift+Tab focus escape (avoid keyboard trap).
+
+## Install
+
+### Using a package manager
+
+You can install `mokai` via **npm** or **yarn**:
 
 ```bash
-## Install using NPM
-$ npm install --save codecake
+# npm
+npm install mokai
 
-## Or install using yarn
-$ yarn add codecake
+# yarn
+yarn add mokai
 ```
 
-In your HTML code, import the `codecake.css` style:
+Then import the stylesheet (ships as `styles.css`) and the editor:
 
-```html
-<link rel="stylesheet" href="https://unpkg.com/codecake/codecake.css">
+```js
+import "mokai/styles.css";         // core layout + base token hooks (no colors)
+import mokai from "mokai";
 ```
 
-Create a new `<div>` element:
+### Via CDN (unpkg example)
 
 ```html
-<div id="editor" class=""></div>
-```
-
-In your `<script type="module">` tag, import **CodeCake** and initialize the editor:
-
-```html
+<link rel="stylesheet" href="https://unpkg.com/mokai/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/mokai-themes/styles.css">
+<div id="editor"></div>
 <script type="module">
-    import * as CodeCake from "https://unpkg.com/codecake/codecake.js";
-
-    const parent = document.getElementById("editor");
-    const cake = CodeCake.create(parent, {
+    import mokai from "https://unpkg.com/mokai/index.js";
+    const editor = mokai(document.getElementById("editor"), {
         language: "javascript",
-        className: "codecake-dark",
-        highlight: CodeCake.highlight,
+        className: "mokai-dark", // requires theme CSS from mokai-themes
+        lineNumbers: true,
     });
+    editor.setCode("console.log('Hello Mokai');\n");
 </script>
+```
+
+## Quick start (module bundler)
+
+```js
+import "mokai/styles.css";            // structural styles
+import "mokai-themes/styles.css";     // optional: bundled themes
+import mokai from "mokai";
+import highlight from "mokai-syntax"; // optional highlighting
+
+const editor = mokai(document.getElementById("editor"), {
+    language: "javascript",
+    highlight,
+    className: "mokai-one-dark",
+    lineNumbers: true,
+});
+
+editor.onChange(code => {
+    console.log("Current code:", code);
+});
+
+editor.setCode("function hi() {\n  console.log('hi');\n}\n");
 ```
 
 ## API
 
-### CodeCake.create(target, options)
+### `mokai(parent: HTMLElement, options?: MokaiOptions): MokaiEditor`
 
-The first argument of the `CodeCake.create` function is the reference to the `<div>` element. The second argument is an object with the editor options:
+Creates the editor inside `parent` (Mokai appends its internal DOM). Returns an object implementing:
 
-- `language`: language of the code. This value will be also passed as the second argument of the function provided in `options.highlight`. Default is `""`.
-- `readOnly`: editor will be in read-only mode. Default is `false`.
-- `lineNumbers`: editor will display line numbers. Default is `false`.
-- `indentWithTabs`: editor will use the tab character `"\t"` for indentation instead of spaces. Default is `false`.
-- `tabSize`: number of spaces for a tab. Default is `4`.
-- `autoIndent`: automatically add indentation on new lines. It also adds an extra line on closing brackets, braces and parenheses. Default is `true`.
-- `addClosing`: automatically close brackets, braces, parentheses, and quotes. Default is `true`.
-- `highlight`: provide a custom function to highlight code. Default is `null` (no highlight). The provided function will be called with the current code to highlight and the language string provided in `options.language`.
-- `className`: custom classname to customize the editing area. Default is `""`.
+| Method | Description |
+|--------|-------------|
+| `getCode()` | Returns current code (always ends with a newline). |
+| `setCode(code)` | Replaces the entire content (adds trailing newline if missing). |
+| `onChange(fn)` | Register a debounced change listener (fires after internal update + highlighting). |
+| `onKeyDown(fn)` | Listen to raw `keydown` before Mokai handles it. |
+| `onKeyUp(fn)` | Listen to `keyup` after internal handling. |
 
-The `CodeCake.create` function will return an object with some methods that you can use to manipulate the editor.
+### Options (`MokaiOptions`)
 
-Use `cake.getCode()` to get the current code in the editor.
+| Option | Type | Default | Notes |
+|--------|------|---------|-------|
+| `language` | `string` | `""` | Passed to your `highlight` function. |
+| `readOnly` | `boolean` | `false` | Disables content edits. |
+| `lineNumbers` | `boolean` | `false` | Shows a gutter with line numbers. |
+| `indentWithTabs` | `boolean` | `false` | Use `\t` instead of spaces. |
+| `tabSize` | `number` | `4` | Number of spaces per indent (ignored if tabs). |
+| `autoIndent` | `boolean` | `true` | Indent new lines and create extra line after closing braces when appropriate. |
+| `addClosing` | `boolean` | `true` | Auto insert matching `()`, `[]`, `{}`, quotes. |
+| `highlight` | `(code, lang) => string` | `undefined` | Return HTML string (Mokai injects as `innerHTML`). Entire code passed (always newline‑terminated). |
+| `className` | `string` | `""` | Extra class names applied to root `.mokai` element (used for themes). |
 
-```javascript
-const code = cake.getCode();
+### TypeScript
+
+Types are bundled. Import them if you need compile‑time safety:
+
+```ts
+import type { MokaiOptions, MokaiEditor } from "mokai";
 ```
 
-Use `cake.setCode(newCode)` to update the code displayed in the editor.
+## Syntax highlighting
 
-```javascript
-cake.setCode("Hello world");
+Mokai does not bundle a highlighter. You can:
+
+1. Use the tiny companion package `mokai-syntax` (HTML / JS / CSS / Markdown) – predictable, minimal.
+2. Integrate a third‑party library (Prism, highlight.js, Shiki, etc.). Just ensure you return raw HTML with escaped content + token spans from your `highlight` function.
+
+Example with `mokai-syntax`:
+
+```js
+import highlight from "mokai-syntax";
+const editor = mokai(parent, { language: "javascript", highlight });
 ```
 
-Use `cake.onChange` to register a listener that will be called each time user changes the code.
+Example with highlight.js:
 
-```javascript
-cake.onChange(code => {
-    console.log("New code: ", code);
-});
-```
-
-### CodeCake.highlight(code, language)
-
-We provide a tiny highlight module that you can use to highlight the text in your editor. Only basic web languages are supported (`html`, `javascript`,`css`, and `markdown`). Use this function with the `options.highlight` argument:
-
-```javascript
-CodeCake.create(parent, {
+```js
+import hljs from "highlight.js";
+const editor = mokai(parent, {
     language: "javascript",
-    highlight: (code, lang) => {
-        return CodeCake.highlight(code, lang);
-    },
-    // ...other editor options
+    highlight: (code, lang) => hljs.highlight(code, { language: lang || "plaintext" }).value,
 });
 ```
 
 ## Themes
 
-We provide two themes to customize the editor and the highlighted code: `codecake-light` and `codecake-dark`.
+Install `mokai-themes` for a small bundle of ready‑made themes:
 
-```js
-const cake = CodeCake.create(parent, {
-    className: "codecake-dark",
-    // ...other editor options
-});
+```bash
+npm install mokai-themes
 ```
 
-## Custom highlight
-
-You can use other syntax highlight like [highlight.js](https://highlightjs.org/) or [Prism](https://prismjs.com/). Call the syntax highlighter using the `options.highlight` option of `CodeCake.create`:
-
 ```js
-CodeCake.create(parent, {
-    language: "javascript"
-    highlight: (code, lang) => {
-        return hljs.highlight(code, {language: lang}).value;
-    },
-    // ...other editor options
-});
+import "mokai/styles.css";          // core editor structure
+import "mokai-themes/styles.css";   // theme classes
+
+const editor = mokai(parent, { className: "mokai-dark" });
 ```
 
-## Preventing keyboard trap
+Available themes (see `mokai-themes` README for details): `mokai-light`, `mokai-dark`, `mokai-monoblue`, `mokai-one-light`, `mokai-one-dark`.
 
-The `Tab` key is commonly used by developers to indent code. However, this can sometimes lead to unexpected behavior, where the focus remains trapped within the editor, disrupting the workflow. To address this, we have introduced the `Esc` `Tab` key combination to move to the next focusable element, and the `Esc` `Shift + Tab` key combination to move to the previous focusable element.
+Create your own by defining `.mokai-my-theme { ... }` plus token color rules (e.g. `.mokai-my-theme .token-keyword { color:#c92c2c; }`) and pass `className: "mokai-my-theme"`.
 
-Please note that **we do not provide built-in help or a dedicated user interface for this feature**. This is because the editor is designed as a lightweight code editor component, not a standalone application. Users are encouraged to consult the documentation or any user guides provided within the context of the web application that incorporates this component for information on available keyboard shortcuts and features.
+## Accessibility & Focus Management
+
+Mokai is designed to avoid trapping keyboard focus within the editor, supporting accessible navigation for all users. Editor content uses `contenteditable` (with `plaintext-only` where supported) and does not permanently trap focus.
+
+- **Move focus forward:** Press `Esc` then `Tab` to shift focus to the next focusable element.
+- **Move focus backward:** Press `Esc` then `Shift+Tab` to shift focus to the previous focusable element.
+- **Indentation:** The `Tab` key is reserved for code indentation, as is common in code editors.
+
+These shortcuts help prevent keyboard trap scenarios, ensuring users can easily navigate away from the editor when needed. Mokai intentionally does not provide a built-in shortcuts help UI; document any shortcuts in your host application as needed.
+
+## Design notes / limitations
+
+- Not a full IDE: no search panel, no multi‑file model, no undo stack persistence beyond browser default selection behavior.
+- Highlighting is whatever you provide – Mokai just injects HTML.
+- Entire document is re‑highlighted (keep code blocks modest for best performance).
+- Internally Mokai ensures the stored code ends with a newline; account for that if doing diffing.
+
+## Migration from CodeCake
+
+If you used the earlier name `codecake`:
+
+| Before (`codecake`) | Now (`mokai`) |
+|---------------------|---------------|
+| `import * as CodeCake from "codecake";` | `import mokai from "mokai";` |
+| `CodeCake.create(parent, opts)` | `mokai(parent, opts)` (default export) |
+| `CodeCake.highlight` (bundled) | Use `mokai-syntax` or another highlighter |
+| Themes `codecake-light/dark` | Themes now provided by `mokai-themes` (`mokai-light`, `mokai-dark`, etc.) |
+| CSS `codecake.css` | `mokai/styles.css` |
+
+No behavioral breaking changes other than renaming and moving the optional highlighter to a separate package.
+
+## Security
+
+If you supply a `highlight` function, ensure it escapes untrusted content. The companion `mokai-syntax` already escapes all raw characters. Only inject the resulting HTML into trusted containers (never into attributes or unsanitized contexts) to avoid XSS.
 
 ## License
 
-CodeCake is released under the [MIT License](./LICENSE).
+Mokai is released under the [MIT License](./LICENSE).
+
+> Questions / tiny improvements welcome – open an issue or PR.
