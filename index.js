@@ -205,7 +205,7 @@ export default (parent, options = {}) => {
     editor.addEventListener("scroll", () => lines.style.top = `-${editor.scrollTop}px`);
     editor.addEventListener("paste", () => update(10));
     // Initialize editor values
-    options?.code ? setCode(options?.code) : update(1);
+    options?.value ? setCode(options?.value) : update(1);
     return {
         get: () => getCode(),
         set: code => setCode(code || "", 1),
