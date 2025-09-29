@@ -25,6 +25,9 @@ export interface MokaiOptions {
 
     /** Extra class name(s) added to the root element. */
     className?: string;
+
+    /** Optional initial code value loaded into the editor. If omitted an empty document (with trailing newline) is initialized. */
+    value?: string;
 };
 
 export type MokaiEventName = "change" | "keydown" | "keyup";
@@ -38,9 +41,12 @@ export interface MokaiEditor {
     get(): string;
 
     /** Replace entire editor content. */
-    set(code: string): void;
+    set(value: string): void;
 
-    /** Listen to internal events. */
+    /**
+     * Listen to internal events. Only one listener per event is stored; subsequent calls to `on` with the
+     * same event name replace the previous listener. Use `off(event)` to remove the current listener.
+     */
     on(eventName: "change", listener: (event: MokaiChangeEvent) => void): void;
     on(eventName: "keydown", listener: (event: KeyboardEvent) => void): void;
     on(eventName: "keyup", listener: (event: KeyboardEvent) => void): void;
