@@ -55,7 +55,8 @@ import mokai from "mokai";
         className: "mokai-dark", // requires theme CSS from mokai-themes
         lineNumbers: true,
     });
-    editor.setCode("console.log('Hello Mokai');\n");
+    editor.set("console.log('Hello Mokai');\n");
+    editor.on("change", ({ value }) => console.log("Changed:", value));
 </script>
 ```
 
@@ -74,11 +75,11 @@ const editor = mokai(document.getElementById("editor"), {
     lineNumbers: true,
 });
 
-editor.onChange(code => {
-    console.log("Current code:", code);
+editor.on("change", ({ value }) => {
+    console.log("Current code:", value);
 });
 
-editor.setCode("function hi() {\n  console.log('hi');\n}\n");
+editor.set("function hi() {\n  console.log('hi');\n}\n");
 ```
 
 ## API
@@ -89,11 +90,10 @@ Creates the editor inside `parent` (Mokai appends its internal DOM). Returns an 
 
 | Method | Description |
 |--------|-------------|
-| `getCode()` | Returns current code (always ends with a newline). |
-| `setCode(code)` | Replaces the entire content (adds trailing newline if missing). |
-| `onChange(fn)` | Register a debounced change listener (fires after internal update + highlighting). |
-| `onKeyDown(fn)` | Listen to raw `keydown` before Mokai handles it. |
-| `onKeyUp(fn)` | Listen to `keyup` after internal handling. |
+| `get()` | Returns current code (always ends with a newline). |
+| `set(code)` | Replaces the entire content (adds trailing newline if missing). |
+| `on(event, listener)` | Subscribe to an event (`change`, `keydown`, `keyup`). For `change` you get `{ value }`. Keyboard events receive the native event. |
+| `off(event)` | Unsubscribe / remove the listener for that event. |
 
 ### Options (`MokaiOptions`)
 
@@ -128,7 +128,12 @@ Example with `mokai-syntax`:
 
 ```js
 import highlight from "mokai-syntax";
-const editor = mokai(parent, { language: "javascript", highlight });
+const editor = mokai(parent, {
+    language: "javascript",
+    highlight: (code, lang) => highlight(code, lang),
+});
+
+editor.on("change", ({ value }) => console.log(value));
 ```
 
 Example with highlight.js:
@@ -139,6 +144,8 @@ const editor = mokai(parent, {
     language: "javascript",
     highlight: (code, lang) => hljs.highlight(code, { language: lang || "plaintext" }).value,
 });
+
+editor.on("change", ({ value }) => {/* handle updated code */});
 ```
 
 ## Themes
@@ -185,6 +192,9 @@ If you used the earlier name `codecake`:
 |---------------------|---------------|
 | `import * as CodeCake from "codecake";` | `import mokai from "mokai";` |
 | `CodeCake.create(parent, opts)` | `mokai(parent, opts)` (default export) |
+| `cake.getCode() / cake.setCode()` | `editor.get() / editor.set()` |
+| `cake.onChange(code => { ... })` | `editor.on("change", ({ value }) => { ... })` |
+| `cake.onKeyDown(fn) / cake.onKeyUp(fn)` | `editor.on("keydown", fn) / editor.on("keyup", fn)` |
 | `CodeCake.highlight` (bundled) | Use `mokai-syntax` or another highlighter |
 | Themes `codecake-light/dark` | Themes now provided by `mokai-themes` (`mokai-light`, `mokai-dark`, etc.) |
 | CSS `codecake.css` | `mokai/styles.css` |
