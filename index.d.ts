@@ -1,4 +1,4 @@
-export interface MokaiOptions {
+export type MokaiOptions = {
     /** Language id passed to the highlight function (if provided). Defaults to "" */
     language?: string;
 
@@ -36,7 +36,7 @@ export type MokaiChangeEvent = {
     value: string;
 };
 
-export interface MokaiEditor {
+export type MokaiEditor = {
     /** Current editor code (always stored with a trailing newline internally). */
     get(): string;
 
