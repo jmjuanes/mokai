@@ -1,3 +1,18 @@
+const createEventEmitter = () => {
+    const listeners = {};
+    return {
+        on: (eventName, listener) => {
+            listeners[eventName] = listener;
+        },
+        off: eventName => {
+            delete listeners[eventName];
+        },
+        emit: (eventName, payload) => {
+            (typeof listeners[eventName] === "function") && listeners[eventName](payload);
+        },
+    };
+};
+
 const insertText = text => {
     const sel = window.getSelection();
     const range = sel.getRangeAt(0);
@@ -54,7 +69,7 @@ const getEditorTemplate = () => {
 
 export default (parent, options = {}) => {
     let prevCode = "", linesCount = -1, focus = false, escKeyPressed = false;
-    const listeners = {}; // Store events listeners
+    const emitter = createEventEmitter();
     const tab = options?.indentWithTabs ? "\t" : " ".repeat(options.tabSize || 4);
     const endl = String.fromCharCode(10);
     const autoIndent = options?.autoIndent ?? true;
@@ -120,12 +135,12 @@ export default (parent, options = {}) => {
             }
         }
         (typeof options.highlight === "function") && (editor.innerHTML = options.highlight(currentCode, options.language || ""));
-        (typeof listeners["change"] === "function") && listeners["change"](currentCode);
+        emitter.emit("change", { value: currentCode });
         focus && restorePosition(position);
     });
     // Register editor events listeners
     editor.addEventListener("keydown", event => {
-        (typeof listeners["keydown"] === "function") && (listeners["keydown"](event));
+        emitter.emit("keydown", event);
         if (!event.defaultPrevented && !options?.readOnly) {
             prevCode = getCode();
             // Handle inserting new line
@@ -180,7 +195,7 @@ export default (parent, options = {}) => {
         }
     });
     editor.addEventListener("keyup", event => {
-        (typeof listeners["keyup"] === "function") && (listeners["keyup"](event));
+        emitter.emit("keyup", event);
         if (!event.defaultPrevented && !options?.readOnly && prevCode !== getCode()) {
             return update(250);
         }
@@ -194,8 +209,7 @@ export default (parent, options = {}) => {
     return {
         getCode: () => getCode(),
         setCode: code => setCode(code || "", 1),
-        onChange: listener => (listeners["change"] = listener),
-        onKeyDown: listener => (listeners["keydown"] = listener),
-        onKeyUp: listener => (listeners["keyup"] = listener),
+        on: (eventName, listener) => emitter.on(eventName, listener),
+        off: eventName => emitter.off(eventName),
     };
 };
