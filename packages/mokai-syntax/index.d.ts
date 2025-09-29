@@ -4,7 +4,7 @@
 /**
  * Supported primary language keys.
  */
-export type MokaiLanguage = "html" | "javascript" | "css" | "markdown" | "json";
+export type MokaiLanguage = "html" | "javascript" | "css" | "markdown" | "json" | "yaml";
 
 /**
  * Highlight a code snippet into HTML with span tokens.
