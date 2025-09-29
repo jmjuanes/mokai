@@ -27,21 +27,26 @@ export interface MokaiOptions {
     className?: string;
 };
 
+export type MokaiEventName = "change" | "keydown" | "keyup";
+
+export type MokaiChangeEvent = {
+    value: string;
+};
+
 export interface MokaiEditor {
     /** Current editor code (always stored with a trailing newline internally). */
-    getCode(): string;
+    get(): string;
 
     /** Replace entire editor content. */
-    setCode(code: string): void;
+    set(code: string): void;
 
-    /** Listen to debounced content changes (fires after highlight / processing). */
-    onChange(listener: (code: string) => void): void;
+    /** Listen to internal events. */
+    on(eventName: "change", listener: (event: MokaiChangeEvent) => void): void;
+    on(eventName: "keydown", listener: (event: KeyboardEvent) => void): void;
+    on(eventName: "keyup", listener: (event: KeyboardEvent) => void): void;
 
-    /** Listen to keydown events before internal handling. */
-    onKeyDown(listener: (event: KeyboardEvent) => void): void;
-
-    /** Listen to keyup events after internal handling. */
-    onKeyUp(listener: (event: KeyboardEvent) => void): void;
+    /** Remove listener for the given event. */
+    off(eventName: MokaiEventName): void;
 };
 
 /**
