@@ -162,13 +162,67 @@ const languages = {
     css: {
         aliases: [],
         rules: [
-            // ... (sin cambios)
+            {
+                starts: /^\/\*/,
+                ends: /\*\//,
+                rules: [
+                    {regex: /^(.+)/, token: "comment"},
+                ],
+            },
+            {regex: /^([{},;])/, token: "punctuation"},
+            {regex: /^(@(font-face|import|keyframes))/, token: "keyword"},
+            {
+                regex: /^([a-z\-]+\s*:\s*[^;\n]+);/,
+                rules: [
+                    {
+                        regex: /^([a-z\-]+\s*:)/,
+                        rules: [
+                            {regex: /^([a-z\-]+)/, token: "attribute"},
+                            {regex: /^(:)/, token: "punctuation"},
+                        ],
+                    },
+                    {regex: /^(#[\da-f]{3,8})/, token: "constant"},
+                    {regex: /^([+-]?([0-9]*[.])?[0-9]+)/, token: "number"},
+                    {regex: /^(\'(?:.)*?\')|^(\"(?:.)*?\")/, token: "string"},
+                    {regex: new RegExp(`^\\b(${cssConstants.join("|")})\\b`), token: "constant"},
+                    {regex: /^\b(cm|mm|in|px|pt|pc|em|rem|vw|vh)\b/, token: "unit"},
+                ],
+            },
+            {regex: /^(::?[a-z]+)/, token: "selector-pseudo"},
+            {regex: /^(\[[^\]]+\])/, token: "selector-attr"},
+            {regex: /^(\.[\w\-\_]+)/, token: "selector-class"},
+            {regex: /^(\#[\w\-\_]+)/, token: "selector-id"},
+            {regex: /^(body|html|a|div|table|td|tr|th|input|button|textarea|label|form|svg|g|path|rect|circle|ul|li|ol)\b/, token: "selector-tag"},
+            {regex: /^(\'(?:.)*?\')|^(\"(?:.)*?\")/, token: "string"},
         ],
     },
     markdown: {
         aliases: ["md"],
         rules: [
-            // ... (sin cambios)
+            {regex: /^(#{1,6}[^\n]+)/, token: "section"},
+            {regex: /^(\`{3}[^\`{3}]+\`{3})/, token: "code"},
+            {regex: /^(\`[^\`\n]+\`)/, token: "code"},
+            {regex: /^ *([\*\-+:]|\d+\.) /, token: "bullet"},
+            {regex: /^(\*{2}[^\*\n]+\*{2})/, token: "strong"},
+            {regex: /^(\*[^\*\n]+\*)/, token: "emphasis"},
+            {
+                regex: /^(!?\[[^\]\n]*]\([^\)\n]+\))/,
+                rules: [
+                    {
+                        regex: /^(\[.+\])/,
+                        rules: [
+                            {regex: /^([^\[\]]+)/, token: "string"},
+                        ],
+                    },
+                    {
+                        regex: /^(\(.+\))/,
+                        rules: [
+                            {regex: /^([^\(\)]+)/, token: "link"},
+                        ],
+                    }
+                ],
+            },
+            {regex: /^(\> [^\n]+)/, token: "quote"},
         ],
     },
 };
