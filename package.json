@@ -1,6 +1,6 @@
 {
     "name": "mokai",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "type": "module",
     "description": "Tiny code editor for the web",
     "repository": "https://github.com/jmjuanes/mokai",
