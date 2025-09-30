@@ -199,7 +199,30 @@ const languages = {
     markdown: {
         aliases: ["md"],
         rules: [
-            // ... (sin cambios)
+            {regex: /^(#{1,6}[^\n]+)/, token: "section"},
+            {regex: /^(\`{3}[^\`{3}]+\`{3})/, token: "code"},
+            {regex: /^(\`[^\`\n]+\`)/, token: "code"},
+            {regex: /^ *([\*\-+:]|\d+\.) /, token: "bullet"},
+            {regex: /^(\*{2}[^\*\n]+\*{2})/, token: "strong"},
+            {regex: /^(\*[^\*\n]+\*)/, token: "emphasis"},
+            {
+                regex: /^(!?\[[^\]\n]*]\([^\)\n]+\))/,
+                rules: [
+                    {
+                        regex: /^(\[.+\])/,
+                        rules: [
+                            {regex: /^([^\[\]]+)/, token: "string"},
+                        ],
+                    },
+                    {
+                        regex: /^(\(.+\))/,
+                        rules: [
+                            {regex: /^([^\(\)]+)/, token: "link"},
+                        ],
+                    }
+                ],
+            },
+            {regex: /^(\> [^\n]+)/, token: "quote"},
         ],
     },
 };
