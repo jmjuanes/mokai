@@ -80,6 +80,7 @@ export default (parent, options = {}) => {
     const endl = String.fromCharCode(10);
     const autoIndent = options?.autoIndent ?? true;
     const addClosing = options?.addClosing ?? true;
+    const allowHistory = options?.history ?? true;
     const openChars = `[({"'`, closeChars = `])}"'`;
     parent.appendChild(getEditorTemplate());
     const editor = parent.querySelector(".mokai-editor");
@@ -138,7 +139,7 @@ export default (parent, options = {}) => {
             editor.textContent = currentCode;
         }
         // Record current state in history
-        if (historyIndex === -1 || history[historyIndex].code !== currentCode) {
+        if (allowHistory && (historyIndex === -1 || history[historyIndex].code !== currentCode)) {
             history = history.slice(0, historyIndex + 1);
             history.push({ code: currentCode, position: position || 0 });
             historyIndex++;
@@ -162,7 +163,7 @@ export default (parent, options = {}) => {
             const isZ = event.key.toLowerCase() === "z";
             const isY = event.key.toLowerCase() === "y";
             // Handle undo and redo shortcuts
-            if ((event.ctrlKey || event.metaKey) && (isZ || isY)) {
+            if (allowHistory && (event.ctrlKey || event.metaKey) && (isZ || isY)) {
                 const isRedo = isY || (isZ && event.shiftKey);
                 const state = isRedo ? history[historyIndex + 1] : history[historyIndex - 1];
                 if (state) {
