@@ -106,6 +106,7 @@ Creates the editor inside `parent` (Mokai appends its internal DOM). Returns an 
 | `tabSize` | `number` | `4` | Number of spaces per indent (ignored if tabs). |
 | `autoIndent` | `boolean` | `true` | Indent new lines and create extra line after closing braces when appropriate. |
 | `addClosing` | `boolean` | `true` | Auto insert matching `()`, `[]`, `{}`, quotes. |
+| `history` | `boolean` | `true` | Enable internal history for undo/redo support. |
 | `highlight` | `(code, lang) => string` | `undefined` | Return HTML string (Mokai injects as `innerHTML`). Entire code passed (always newline‑terminated). |
 | `className` | `string` | `""` | Extra class names applied to root `.mokai` element (used for themes). |
 
@@ -179,7 +180,7 @@ These shortcuts help prevent keyboard trap scenarios, ensuring users can easily 
 
 ## Design notes / limitations
 
-- Not a full IDE: no search panel, no multi‑file model, no undo stack persistence beyond browser default selection behavior.
+- Not a full IDE: no search panel, no multi‑file model.
 - Highlighting is whatever you provide – Mokai just injects HTML.
 - Entire document is re‑highlighted (keep code blocks modest for best performance).
 - Internally Mokai ensures the stored code ends with a newline; account for that if doing diffing.
