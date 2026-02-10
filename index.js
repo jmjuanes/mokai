@@ -47,9 +47,14 @@ const getTextNodeAtPosition = (root, index) => {
         }
         return NodeFilter.FILTER_ACCEPT;
     });
+    const node = walker.nextNode();
+    if (node) {
+        return { node, position: index };
+    }
+    // If no text node found, return the last text node or the root
     return {
-        node: walker.nextNode() || root,
-        position: index,
+        node: root.lastChild || root,
+        position: (root.lastChild && root.lastChild.nodeType === Node.TEXT_NODE) ? root.lastChild.textContent.length : 0,
     };
 };
 
@@ -69,6 +74,7 @@ const getEditorTemplate = () => {
 
 export default (parent, options = {}) => {
     let prevCode = "", linesCount = -1, focus = false, escKeyPressed = false;
+    let history = [], historyIndex = -1;
     const emitter = createEventEmitter();
     const tab = options?.indentWithTabs ? "\t" : " ".repeat(options.tabSize || 4);
     const endl = String.fromCharCode(10);
@@ -107,9 +113,13 @@ export default (parent, options = {}) => {
     const getCodeAfter = () => getCodeBeforeOrAfter(editor, +1);
     // Position managers
     const savePosition = () => {
-        const range = window.getSelection().getRangeAt(0);
-        range.setStart(editor, 0);
-        return range.toString().length;
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0).cloneRange();
+            range.setStart(editor, 0);
+            return range.toString().length;
+        }
+        return 0;
     };
     const restorePosition = index => {
         const selection = window.getSelection();
@@ -127,6 +137,13 @@ export default (parent, options = {}) => {
             currentCode = currentCode + endl;
             editor.textContent = currentCode;
         }
+        // Record current state in history
+        if (historyIndex === -1 || history[historyIndex].code !== currentCode) {
+            history = history.slice(0, historyIndex + 1);
+            history.push({ code: currentCode, position: position || 0 });
+            historyIndex++;
+            (history.length > 50) && (history.shift(), historyIndex--);
+        }
         if (options.lineNumbers) {
             const count = Math.max(currentCode.split(endl).length - 1, 1);
             if (linesCount !== count) {
@@ -136,12 +153,27 @@ export default (parent, options = {}) => {
         }
         (typeof options.highlight === "function") && (editor.innerHTML = options.highlight(currentCode, options.language || ""));
         emitter.emit("change", { value: currentCode });
-        focus && restorePosition(position);
+        (focus && typeof position === "number") && restorePosition(position);
     });
     // Register editor events listeners
     editor.addEventListener("keydown", event => {
         emitter.emit("keydown", event);
         if (!event.defaultPrevented && !options?.readOnly) {
+            const isZ = event.key.toLowerCase() === "z";
+            const isY = event.key.toLowerCase() === "y";
+            // Handle undo and redo shortcuts
+            if ((event.ctrlKey || event.metaKey) && (isZ || isY)) {
+                const isRedo = isY || (isZ && event.shiftKey);
+                const state = isRedo ? history[historyIndex + 1] : history[historyIndex - 1];
+                if (state) {
+                    event.preventDefault();
+                    historyIndex = isRedo ? historyIndex + 1 : historyIndex - 1;
+                    editor.textContent = state.code;
+                    update(1);
+                    restorePosition(state.position);
+                }
+                return;
+            }
             prevCode = getCode();
             // Handle inserting new line
             if (event.key === "Enter" && autoIndent) {
