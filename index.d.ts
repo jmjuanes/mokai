@@ -20,6 +20,9 @@ export type MokaiOptions = {
     /** Automatically indent on new lines. Defaults to true */
     autoIndent?: boolean;
 
+    /** Enable internal history for undo/redo support. Defaults to true */
+    history?: boolean;
+
     /** Optional syntax highlighting function returning HTML; receives full code (always ends with a newline) */
     highlight?: (code: string, language: string) => string;
 
